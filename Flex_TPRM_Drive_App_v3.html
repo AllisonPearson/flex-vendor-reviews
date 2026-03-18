@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flex · TPRM Review</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0A0E1A;
+    --ink-mid: #131929;
+    --ink-light: #1C2640;
+    --ink-border: #232f4a;
+    --teal: #00C2A8;
+    --teal-dim: rgba(0,194,168,0.12);
+    --teal-glow: rgba(0,194,168,0.06);
+    --amber: #F5A623;
+    --red: #FF5C5C;
+    --green: #3DD68C;
+    --slate: #8BA0BF;
+    --slate-dim: #4A607A;
+    --white: #EEF2F8;
+    --white-dim: #B8C4D6;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--ink);
+    color: var(--white);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated mesh background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 80% 20%, rgba(0,194,168,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 60% at 10% 80%, rgba(245,166,35,0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Fine dot grid */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(139,160,191,0.15) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 56px 28px 80px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    margin-bottom: 52px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .wordmark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+
+  .wordmark-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--teal);
+    box-shadow: 0 0 12px var(--teal);
+    animation: breathe 3s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .wordmark-text {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--slate);
+  }
+
+  h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 52px;
+    line-height: 1.05;
+    font-weight: 400;
+    color: var(--white);
+    margin-bottom: 14px;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--teal);
+  }
+
+  .header-desc {
+    font-size: 15px;
+    color: var(--slate);
+    line-height: 1.65;
+    font-weight: 400;
+    max-width: 520px;
+  }
+
+  /* ── GOOGLE AUTH ── */
+  .auth-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--ink-mid);
+    border: 1px solid var(--ink-border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 28px;
+    animation: fadeUp 0.6s 0.1s ease both;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .auth-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--slate);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .auth-indicator {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--slate-dim);
+    transition: background 0.3s, box-shadow 0.3s;
+    flex-shrink: 0;
+  }
+
+  .auth-indicator.connected {
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+  }
+
+  .auth-indicator.error {
+    background: var(--red);
+    box-shadow: 0 0 8px var(--red);
+  }
+
+  .auth-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--white);
+    color: var(--ink);
+    border: none;
+    border-radius: 7px;
+    padding: 9px 16px;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .auth-btn:hover { background: #d0daf0; transform: translateY(-1px); }
+  .auth-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .auth-btn svg { width: 16px; height: 16px; }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--ink-mid);
+    border: 1px solid var(--ink-border);
+    border-radius: 14px;
+    padding: 32px;
+    margin-bottom: 20px;
+    animation: fadeUp 0.6s 0.15s ease both;
+  }
+
+  .card-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 18px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── DRIVE INPUT ── */
+  .drive-input-wrap {
+    position: relative;
+    margin-bottom: 20px;
+  }
+
+  .drive-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--slate-dim);
+    font-size: 18px;
+    pointer-events: none;
+  }
+
+  .drive-input {
+    width: 100%;
+    background: var(--ink-light);
+    border: 1px solid var(--ink-border);
+    border-radius: 9px;
+    padding: 14px 14px 14px 44px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--white);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .drive-input:focus { border-color: var(--teal); }
+  .drive-input::placeholder { color: var(--slate-dim); }
+
+  /* ── CONTEXT GRID ── */
+  .context-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .context-grid .span-2 { grid-column: 1 / -1; }
+
+  .field-label {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--slate-dim);
+    margin-bottom: 7px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .field-input {
+    width: 100%;
+    background: var(--ink-light);
+    border: 1px solid var(--ink-border);
+    border-radius: 8px;
+    padding: 11px 13px;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    color: var(--white);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .field-input:focus { border-color: var(--teal); }
+  .field-input::placeholder { color: var(--slate-dim); }
+  select.field-input option { background: var(--ink-mid); }
+
+  /* ── RUN BUTTON ── */
+  .run-btn {
+    width: 100%;
+    padding: 17px;
+    background: var(--teal);
+    color: var(--ink);
+    border: none;
+    border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .run-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.5s;
+  }
+
+  .run-btn:hover:not(:disabled)::after { transform: translateX(100%); }
+  .run-btn:hover:not(:disabled) {
+    background: #00d9bc;
+    box-shadow: 0 6px 28px rgba(0,194,168,0.3);
+    transform: translateY(-1px);
+  }
+
+  .run-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+  /* ── LOADING ── */
+  .loading-wrap { display: none; margin-top: 18px; }
+  .loading-wrap.visible { display: block; }
+
+  .loading-track {
+    height: 2px;
+    background: var(--ink-border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .loading-fill {
+    height: 100%;
+    width: 40%;
+    background: linear-gradient(90deg, transparent, var(--teal), transparent);
+    border-radius: 2px;
+    animation: scan 1.6s ease-in-out infinite;
+  }
+
+  @keyframes scan {
+    0% { transform: translateX(-150%); }
+    100% { transform: translateX(400%); }
+  }
+
+  .loading-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--slate);
+    text-align: center;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── ERROR ── */
+  .error-box {
+    background: rgba(255,92,92,0.08);
+    border: 1px solid rgba(255,92,92,0.3);
+    border-radius: 9px;
+    padding: 14px 18px;
+    color: #FF8E8E;
+    font-size: 13px;
+    margin-top: 16px;
+    display: none;
+    line-height: 1.6;
+  }
+  .error-box.visible { display: block; }
+
+  /* ── RESULTS ── */
+  #results { display: none; }
+  #results.visible { display: block; animation: fadeUp 0.5s ease both; }
+
+  .results-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  .results-heading {
+    font-family: 'Instrument Serif', serif;
+    font-size: 32px;
+    font-weight: 400;
+    color: var(--white);
+  }
+
+  .results-vendor {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--slate);
+    margin-top: 5px;
+    letter-spacing: 0.06em;
+  }
+
+  .new-btn {
+    background: none;
+    border: 1px solid var(--ink-border);
+    color: var(--slate);
+    padding: 9px 18px;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .new-btn:hover { border-color: var(--teal); color: var(--teal); }
+
+  /* ── PROFILE BADGES ── */
+  .badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-bottom: 28px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 13px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: 1px solid;
+  }
+
+  .badge-high { background: rgba(255,92,92,0.1); border-color: rgba(255,92,92,0.35); color: #FF7A7A; }
+  .badge-medium { background: rgba(245,166,35,0.1); border-color: rgba(245,166,35,0.35); color: #F5A623; }
+  .badge-low { background: rgba(61,214,140,0.1); border-color: rgba(61,214,140,0.35); color: #3DD68C; }
+  .badge-critical { background: rgba(255,92,92,0.07); border-color: rgba(255,92,92,0.25); color: #FF9090; }
+  .badge-noncritical { background: var(--teal-dim); border-color: rgba(0,194,168,0.3); color: var(--teal); }
+  .badge-combined { background: rgba(139,160,191,0.07); border-color: var(--ink-border); color: var(--white-dim); }
+
+  /* ── SECTION CARDS ── */
+  .section-card {
+    background: var(--ink-mid);
+    border: 1px solid var(--ink-border);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 22px;
+    cursor: pointer;
+    transition: background 0.15s;
+    user-select: none;
+  }
+
+  .section-head:hover { background: rgba(0,194,168,0.03); }
+  .section-head.open { border-bottom: 1px solid var(--ink-border); }
+
+  .section-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-num {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--teal-dim);
+    border: 1px solid rgba(0,194,168,0.25);
+    color: var(--teal);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .section-title-text {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--slate);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .section-chevron {
+    color: var(--slate-dim);
+    font-size: 11px;
+    transition: transform 0.2s;
+  }
+  .section-head.open .section-chevron { transform: rotate(180deg); }
+
+  .section-body {
+    display: none;
+    padding: 22px;
+  }
+  .section-body.open { display: block; }
+
+  .section-content {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--white-dim);
+    white-space: pre-wrap;
+    font-family: 'Syne', sans-serif;
+  }
+
+  .memo-content {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.9;
+    color: var(--slate);
+    white-space: pre-wrap;
+    background: var(--ink-light);
+    border: 1px solid var(--ink-border);
+    border-radius: 8px;
+    padding: 22px;
+    word-break: break-word;
+  }
+
+  .section-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 14px;
+  }
+
+  .copy-btn {
+    background: none;
+    border: 1px solid var(--ink-border);
+    color: var(--slate);
+    padding: 7px 14px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .copy-btn:hover { border-color: var(--teal); color: var(--teal); }
+  .copy-btn.copied { border-color: var(--green); color: var(--green); }
+
+  /* ── SAVE TO DRIVE CARD ── */
+  .drive-save-card {
+    background: var(--ink-mid);
+    border: 1px solid rgba(0,194,168,0.25);
+    border-radius: 14px;
+    padding: 28px;
+    margin-top: 20px;
+  }
+
+  .drive-save-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .drive-save-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--teal-dim);
+    border: 1px solid rgba(0,194,168,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .drive-save-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--white);
+  }
+
+  .drive-save-sub {
+    font-size: 12px;
+    color: var(--slate);
+    margin-top: 2px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .folder-path {
+    background: var(--ink-light);
+    border: 1px solid var(--ink-border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--teal);
+    margin-bottom: 14px;
+    word-break: break-all;
+    line-height: 1.6;
+  }
+
+  .folder-path span { color: var(--slate); }
+
+  .filename-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .filename-pill {
+    flex: 1;
+    background: var(--ink-light);
+    border: 1px solid var(--ink-border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--white-dim);
+    min-width: 200px;
+  }
+
+  .save-drive-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #00C2A8, #00a08a);
+    color: var(--ink);
+    border: none;
+    border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    letter-spacing: 0.02em;
+  }
+
+  .save-drive-btn:hover:not(:disabled) {
+    box-shadow: 0 8px 28px rgba(0,194,168,0.35);
+    transform: translateY(-1px);
+  }
+
+  .save-drive-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .save-drive-btn.saved {
+    background: linear-gradient(135deg, #3DD68C, #2db870);
+    cursor: default;
+  }
+
+  .save-result {
+    display: none;
+    margin-top: 14px;
+    padding: 14px 18px;
+    border-radius: 9px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .save-result.success {
+    display: block;
+    background: rgba(61,214,140,0.08);
+    border: 1px solid rgba(61,214,140,0.3);
+    color: #3DD68C;
+  }
+
+  .save-result.error {
+    display: block;
+    background: rgba(255,92,92,0.08);
+    border: 1px solid rgba(255,92,92,0.3);
+    color: #FF8E8E;
+  }
+
+  .save-result a {
+    color: var(--teal);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .save-result em {
+    color: var(--white-dim);
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── STEP INDICATOR ── */
+  .steps {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 28px;
+    animation: fadeUp 0.6s 0.05s ease both;
+  }
+
+  .step {
+    flex: 1;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--ink-border);
+    transition: background 0.4s;
+  }
+
+  .step.active { background: var(--teal); }
+  .step.done { background: rgba(0,194,168,0.35); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="wordmark">
+      <div class="wordmark-dot"></div>
+      <span class="wordmark-text">Flex Compliance · TPRM</span>
+    </div>
+    <h1>Vendor Risk<br><em>Review</em></h1>
+    <p class="header-desc">Paste a Google Drive link to a completed questionnaire. Claude will run the full review and save the memo directly to Drive.</p>
+  </div>
+
+  <!-- Step indicator -->
+  <div class="steps">
+    <div class="step active" id="step1"></div>
+    <div class="step" id="step2"></div>
+    <div class="step" id="step3"></div>
+  </div>
+
+  <!-- Google Auth Bar -->
+  <div class="auth-bar">
+    <div class="auth-status">
+      <div class="auth-indicator" id="authIndicator"></div>
+      <span id="authStatusText">Not connected to Google Drive</span>
+    </div>
+    <button class="auth-btn" id="authBtn" onclick="handleAuth()">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      Connect Google Drive
+    </button>
+  </div>
+
+  <!-- Input card -->
+  <div class="card" id="inputCard">
+    <div class="card-label">01 — Questionnaire Source</div>
+
+    <div class="drive-input-wrap">
+      <span class="drive-icon">🔗</span>
+      <input type="url" class="drive-input" id="driveLink"
+        placeholder="https://docs.google.com/spreadsheets/d/..." />
+    </div>
+
+    <div class="context-grid">
+      <div>
+        <label class="field-label">Vendor Name *</label>
+        <input type="text" class="field-input" id="vendorName" placeholder="e.g. Plaid Inc." />
+      </div>
+      <div>
+        <label class="field-label">Relationship</label>
+        <select class="field-input" id="relType">
+          <option value="New">New</option>
+          <option value="Renewal">Renewal</option>
+          <option value="Ongoing">Ongoing</option>
+        </select>
+      </div>
+      <div class="span-2">
+        <label class="field-label">Service Description</label>
+        <input type="text" class="field-input" id="serviceDesc" placeholder="What does this vendor do for Flex?" />
+      </div>
+      <div>
+        <label class="field-label">PII / Data Access</label>
+        <select class="field-input" id="dataAccess">
+          <option value="Unknown">Unknown</option>
+          <option value="Yes — customer PII">Yes — customer PII</option>
+          <option value="Yes — payment data">Yes — payment data</option>
+          <option value="Yes — internal systems only">Yes — internal systems</option>
+          <option value="No">No</option>
+        </select>
+      </div>
+      <div>
+        <label class="field-label">Substitutability</label>
+        <select class="field-input" id="substitutability">
+          <option value="Unknown">Unknown</option>
+          <option value="Hard to replace — no substitutes available">Hard to replace</option>
+          <option value="Replaceable with significant effort">Replaceable with effort</option>
+          <option value="Easily replaceable — alternatives exist">Easily replaceable</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="run-btn" id="runBtn" onclick="runReview()" disabled>
+      Run TPRM Review →
+    </button>
+
+    <div class="loading-wrap" id="loadingWrap">
+      <div class="loading-track"><div class="loading-fill"></div></div>
+      <div class="loading-label" id="loadingLabel">Fetching questionnaire from Drive…</div>
+    </div>
+
+    <div class="error-box" id="errorBox"></div>
+  </div>
+
+  <!-- Results -->
+  <div id="results">
+    <div class="results-top">
+      <div>
+        <div class="results-heading">Review Complete</div>
+        <div class="results-vendor" id="resultsVendorLabel"></div>
+      </div>
+      <button class="new-btn" id="newBtn" onclick="resetApp()">+ New Review</button>
+    </div>
+
+    <div class="badge-row" id="badgeRow"></div>
+    <div id="sectionsContainer"></div>
+
+    <!-- Save to Drive -->
+    <div class="drive-save-card">
+      <div class="drive-save-header">
+        <div class="drive-save-icon">📁</div>
+        <div>
+          <div class="drive-save-title">Save to Google Drive</div>
+          <div class="drive-save-sub" id="driveSaveSub">Creates folder + Google Doc automatically</div>
+        </div>
+      </div>
+
+      <div class="folder-path" id="folderPath">
+        <span>Compliance / TPRM / Active Vendors / </span>…
+      </div>
+
+      <div class="filename-row">
+        <div class="filename-pill" id="filenamePill">TPRM_Vendor_High-Medium-Critical_2026-03-17.docx</div>
+        <button class="copy-btn" onclick="copyFilename(this)">Copy</button>
+      </div>
+
+      <button class="save-drive-btn" id="saveDriveBtn" onclick="saveToDrive()">
+        <span>📄</span> Create Google Doc in Drive
+      </button>
+      <div class="save-result" id="saveResult"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────
+const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID'; // Replace with your OAuth Client ID
+const SCOPES = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets.readonly https://www.googleapis.com/auth/documents';
+let tokenClient = null;
+
+const SYSTEM_PROMPT = `You are a compliance risk analyst for Flexbase Technologies, Inc. (Flex), a fintech offering credit and charge card programs. You specialize in TPRM.
+
+Assess every vendor on TWO independent dimensions:
+(1) RISK TIER: Low/Medium/High — security and compliance posture
+(2) CRITICALITY: Critical/Non-Critical — operational replaceability (hard to replace = Critical)
+
+Produce exactly these sections with these EXACT headers:
+
+### VENDOR PROFILE SUMMARY
+Risk Tier | Residual Risk | Criticality | Combined Profile. One sentence on what the vendor does.
+
+### RISK TIER — INHERENT
+Baseline risk (Low/Medium/High) before controls. Rationale: PII access, BSA/AML relevance, financial data.
+
+### CRITICALITY ASSESSMENT
+Critical / Non-Critical / REQUIRES INTERNAL INPUT with substitutability rationale.
+
+### DOMAIN SCORECARD
+Score 1-5 each domain. Format: [Domain]: [X]/5 — [rationale] — Evidence: [citation]
+Domains: Information Security/SOC2 | BSA/AML & Financial Crime | Data Privacy (CCPA/GDPR) | PII Access & Data Handling
+
+### RESIDUAL RISK
+Inherent Risk adjusted by controls strength.
+- Avg score ≥4, no HIGH gaps → may reduce one tier
+- Avg 2.5-3.9, limited HIGH gaps → unchanged
+- Avg <2.5 or multiple HIGH gaps → stays at or above inherent
+- Critical vendors require stronger evidence to reduce
+State tier + rationale citing specific evidence.
+
+### GAPS & FLAGS
+Numbered list. Format: [PRIORITY] Description — Domain
+BSA/AML and PII = HIGH PRIORITY. Critical vendor gaps = elevated.
+Mark reviewer-clarified answers with ⚑
+
+### FOLLOW-UP QUESTIONS
+3-8 questions by priority (BSA/AML first). Exclude anything already resolved.
+
+### RISK MEMO
+TO: Compliance Team, Flexbase Technologies, Inc.
+FROM: [Reviewer Name]
+DATE: ${new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}
+RE: Third Party Risk Review — [Vendor Name]
+STATUS: DRAFT
+---
+VENDOR OVERVIEW | RISK PROFILE (Inherent/Residual/Criticality/Combined) | INHERENT RISK RATIONALE | RESIDUAL RISK RATIONALE | CRITICALITY RATIONALE | NOTE ON REVIEWER-PROVIDED ANSWERS (⚑) | DOMAIN SCORECARD | FINDINGS SUMMARY | GAPS & REQUIRED FOLLOW-UP | OPEN FOLLOW-UP QUESTIONS | RECOMMENDATION (Approve/Approve with Conditions/Escalate/Reject) | Signatures
+
+TIERS: HIGH=payments/PII/BSA-AML | MEDIUM=limited PII/indirect exposure | LOW=no PII/no financial data
+CRITICALITY: CRITICAL=hard to replace | NON-CRITICAL=replaceable | REQUIRES INPUT=unclear
+Rules: concise, direct, flag HIGH PRIORITY gaps, mark ⚑ clarifications.`;
+
+// ── STATE ────────────────────────────────────────────────────────
+let googleToken = null;
+let reviewData = { text: '', vendor: '', tier: '', residual: '', criticality: '' };
+let driveLink = '';
+
+// ── AUTH (Google Identity Services) ─────────────────────────────
+function initGoogleAuth() {
+  if (!window.google) {
+    setTimeout(initGoogleAuth, 200);
+    return;
+  }
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: GOOGLE_CLIENT_ID,
+    scope: SCOPES,
+    callback: (response) => {
+      if (response.error) {
+        setAuthConnected(false);
+        document.getElementById('authBtn').disabled = false;
+        document.getElementById('authBtn').innerHTML = `<svg viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg> Connect Google Drive`;
+        return;
+      }
+      googleToken = response.access_token;
+      setAuthConnected(true);
+    }
+  });
+}
+
+function handleAuth() {
+  if (!tokenClient) {
+    alert('Google auth is still loading — please try again in a moment.');
+    return;
+  }
+  tokenClient.requestAccessToken({ prompt: 'consent' });
+}
+
+function setAuthConnected(ok) {
+  const ind = document.getElementById('authIndicator');
+  const txt = document.getElementById('authStatusText');
+  const btn = document.getElementById('authBtn');
+  if (ok) {
+    ind.className = 'auth-indicator connected';
+    txt.textContent = 'Connected to Google Drive';
+    btn.textContent = '✓ Connected';
+    btn.disabled = true;
+  } else {
+    ind.className = 'auth-indicator error';
+    txt.textContent = 'Google Drive not connected';
+  }
+  checkReady();
+}
+
+// ── FORM VALIDATION ──────────────────────────────────────────────
+document.getElementById('vendorName').addEventListener('input', checkReady);
+document.getElementById('driveLink').addEventListener('input', checkReady);
+
+function checkReady() {
+  const hasVendor = document.getElementById('vendorName').value.trim();
+  const hasLink = document.getElementById('driveLink').value.trim();
+  document.getElementById('runBtn').disabled = !(hasVendor && hasLink);
+}
+
+// ── FETCH SHEET FROM DRIVE ───────────────────────────────────────
+async function fetchSheetFromDrive(url) {
+  // Extract file ID
+  const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (!match) throw new Error('Could not extract file ID from Drive link. Please check the URL.');
+  const fileId = match[1];
+
+  // Try to export as CSV
+  const exportUrl = `https://www.googleapis.com/drive/v3/files/${fileId}/export?mimeType=text/csv`;
+  let resp = await fetch(exportUrl, {
+    headers: { Authorization: `Bearer ${googleToken}` }
+  });
+
+  if (resp.status === 403) {
+    throw new Error('ACCESS_DENIED');
+  }
+
+  if (!resp.ok) {
+    // Try direct download as fallback (for .xlsx / .csv)
+    const dlUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
+    resp = await fetch(dlUrl, {
+      headers: { Authorization: `Bearer ${googleToken}` }
+    });
+    if (resp.status === 403) throw new Error('ACCESS_DENIED');
+    if (!resp.ok) throw new Error(`Could not read file (status ${resp.status}). Check permissions.`);
+  }
+
+  const text = await resp.text();
+  return csvToQA(text);
+}
+
+function csvToQA(csv) {
+  const lines = csv.split('\n').map(l => l.trim()).filter(Boolean);
+  return lines.map(line => {
+    const cols = line.split(',').map(c => c.replace(/^"|"$/g,'').trim());
+    if (cols.length >= 2) return `Q: ${cols[0]}\nA: ${cols.slice(1).join(' ')}`;
+    return cols[0];
+  }).join('\n\n');
+}
+
+// ── RUN REVIEW ───────────────────────────────────────────────────
+async function runReview() {
+  const vendor = document.getElementById('vendorName').value.trim();
+  const service = document.getElementById('serviceDesc').value.trim();
+  const rel = document.getElementById('relType').value;
+  const pii = document.getElementById('dataAccess').value;
+  const sub = document.getElementById('substitutability').value;
+  driveLink = document.getElementById('driveLink').value.trim();
+
+  hideError();
+  setLoading(true, 'Fetching questionnaire from Drive…');
+  setStep(2);
+
+  let qaContent = '';
+  try {
+    if (googleToken) {
+      qaContent = await fetchSheetFromDrive(driveLink);
+    } else {
+      // No auth — instruct user
+      showError('Please connect Google Drive first to fetch the questionnaire.');
+      setLoading(false);
+      setStep(1);
+      return;
+    }
+  } catch(e) {
+    if (e.message === 'ACCESS_DENIED') {
+      showError(`⚠️ Access denied — the file is not shared with your account.\n\nTo fix this:\n1. Open the file in Google Drive\n2. Click Share → General access\n3. Change to "Anyone with the link" → Viewer\n4. Click Done, then try again.`);
+    } else {
+      showError(e.message);
+    }
+    setLoading(false);
+    setStep(1);
+    return;
+  }
+
+  setLoading(true, 'Running TPRM analysis…');
+
+  const userMsg = `Please conduct a full TPRM review for this vendor.
+
+VENDOR: ${vendor}
+SERVICE: ${service || 'Not specified'}
+RELATIONSHIP: ${rel}
+DATA ACCESS: ${pii}
+SUBSTITUTABILITY: ${sub}
+SOURCE FILE: ${driveLink}
+
+--- QUESTIONNAIRE RESPONSES ---
+
+${qaContent}
+
+--- END ---
+
+Produce all eight sections using the exact headers specified.`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: 'user', content: userMsg }]
+      })
+    });
+
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error.message);
+    const text = data.content?.find(b => b.type === 'text')?.text || '';
+
+    reviewData = {
+      text,
+      vendor,
+      tier: extractTier(text, 'INHERENT'),
+      residual: extractTier(text, 'RESIDUAL'),
+      criticality: extractCriticality(text)
+    };
+
+    renderResults(vendor, rel);
+    setStep(3);
+  } catch(e) {
+    showError('Error from Claude API: ' + e.message);
+    setStep(1);
+  } finally {
+    setLoading(false);
+  }
+}
+
+// ── RENDER RESULTS ───────────────────────────────────────────────
+function renderResults(vendor, rel) {
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('inputCard').style.display = 'none';
+
+  const date = new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
+  document.getElementById('resultsVendorLabel').textContent = `${vendor} · ${date} · ${rel}`;
+
+  // Badges
+  const badgeRow = document.getElementById('badgeRow');
+  const tClass = reviewData.tier === 'High' ? 'badge-high' : reviewData.tier === 'Medium' ? 'badge-medium' : 'badge-low';
+  const rClass = reviewData.residual === 'High' ? 'badge-high' : reviewData.residual === 'Medium' ? 'badge-medium' : 'badge-low';
+  const cClass = reviewData.criticality === 'Critical' ? 'badge-critical' : 'badge-noncritical';
+  badgeRow.innerHTML = `
+    <span class="badge ${tClass}">Inherent: ${reviewData.tier}</span>
+    <span class="badge ${rClass}">Residual: ${reviewData.residual}</span>
+    <span class="badge ${cClass}">${reviewData.criticality}</span>
+    <span class="badge badge-combined">${reviewData.tier} / ${reviewData.residual} / ${reviewData.criticality}</span>`;
+
+  // Sections
+  const sections = parseSections(reviewData.text);
+  const defs = [
+    { key: 'VENDOR PROFILE SUMMARY', label: 'Vendor Profile Summary', n: '1' },
+    { key: 'RISK TIER — INHERENT', label: 'Risk Tier — Inherent', n: '2' },
+    { key: 'CRITICALITY ASSESSMENT', label: 'Criticality Assessment', n: '3' },
+    { key: 'DOMAIN SCORECARD', label: 'Domain Scorecard', n: '4' },
+    { key: 'RESIDUAL RISK', label: 'Residual Risk', n: '5' },
+    { key: 'GAPS & FLAGS', label: 'Gaps & Flags', n: '6' },
+    { key: 'FOLLOW-UP QUESTIONS', label: 'Follow-Up Questions', n: '7' },
+    { key: 'RISK MEMO', label: 'Risk Memo', n: '8' },
+  ];
+
+  const container = document.getElementById('sectionsContainer');
+  container.innerHTML = '';
+
+  // Full copy button
+  const fullCopy = document.createElement('div');
+  fullCopy.style.cssText = 'display:flex;justify-content:flex-end;margin-bottom:12px;';
+  fullCopy.innerHTML = `<button class="copy-btn" onclick="copyText(this,\`${esc(reviewData.text)}\`)">⎘ Copy Full Review</button>`;
+  container.appendChild(fullCopy);
+
+  defs.forEach((def, i) => {
+    const content = sections[def.key] || '';
+    if (!content) return;
+    const isOpen = i < 1;
+    const isMemo = def.key === 'RISK MEMO';
+    const card = document.createElement('div');
+    card.className = 'section-card';
+    card.innerHTML = `
+      <div class="section-head ${isOpen?'open':''}" onclick="toggleSec(this)">
+        <div class="section-title-row">
+          <div class="section-num">${def.n}</div>
+          <div class="section-title-text">${def.label}</div>
+        </div>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body ${isOpen?'open':''}">
+        <div class="${isMemo?'memo-content':'section-content'}">${escHtml(content)}</div>
+        <div class="section-footer">
+          <button class="copy-btn" onclick="copyText(this,\`${esc(content)}\`)">⎘ Copy</button>
+        </div>
+      </div>`;
+    container.appendChild(card);
+  });
+
+  // Drive save card
+  const today = new Date().toISOString().split('T')[0];
+  const safeName = vendor.replace(/[^a-zA-Z0-9]/g,'');
+  const crit = reviewData.criticality === 'Critical' ? 'Critical' : 'NonCritical';
+  const filename = `TPRM_${safeName}_${reviewData.tier}-${reviewData.residual}-${crit}_${today}`;
+  const vendorFolder = `${safeName}_${today}`;
+  const folder = `Legal and Compliance / Vendor Documents / ${vendorFolder}`;
+
+  document.getElementById('folderPath').innerHTML = `<span>📁 </span>Legal and Compliance / Vendor Documents / <strong>${vendorFolder}</strong>`;
+  document.getElementById('filenamePill').textContent = filename + '.gdoc';
+  document.getElementById('saveDriveBtn').dataset.filename = filename;
+  document.getElementById('saveDriveBtn').dataset.folder = folder;
+  document.getElementById('saveDriveBtn').dataset.criticality = crit;
+  document.getElementById('saveDriveBtn').dataset.vendorfolder = vendorFolder;
+
+  document.getElementById('results').classList.add('visible');
+}
+
+// ── SAVE TO DRIVE ────────────────────────────────────────────────
+async function saveToDrive() {
+  if (!googleToken) {
+    showSaveResult('error', 'Please connect Google Drive first using the button at the top.');
+    return;
+  }
+
+  const btn = document.getElementById('saveDriveBtn');
+  const memo = parseSections(reviewData.text)['RISK MEMO'] || reviewData.text;
+  const filename = btn.dataset.filename;
+  const vendorFolder = btn.dataset.vendorfolder;
+
+  btn.disabled = true;
+  btn.innerHTML = '<span>⏳</span> Creating folder & document…';
+
+  try {
+    // 1. Create vendor folder inside Legal and Compliance / Vendor Documents
+    const folderId = await ensureFolderPath(['Legal and Compliance', 'Vendor Documents', vendorFolder]);
+
+    // 2. Create Google Doc (memo)
+    btn.innerHTML = '<span>⏳</span> Saving risk memo…';
+    const docResp = await fetch('https://docs.googleapis.com/v1/documents', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${googleToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ title: filename })
+    });
+
+    if (!docResp.ok) throw new Error('Could not create Google Doc');
+    const doc = await docResp.json();
+    const docId = doc.documentId;
+
+    // 3. Insert memo text
+    await fetch(`https://docs.googleapis.com/v1/documents/${docId}:batchUpdate`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${googleToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        requests: [{ insertText: { location: { index: 1 }, text: memo } }]
+      })
+    });
+
+    // 4. Move memo doc to vendor folder
+    await fetch(`https://www.googleapis.com/drive/v3/files/${docId}?addParents=${folderId}&removeParents=root`, {
+      method: 'PATCH',
+      headers: { 'Authorization': `Bearer ${googleToken}` }
+    });
+
+    // 5. Copy source questionnaire into same folder
+    let questCopyUrl = null;
+    const sourceMatch = driveLink.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (sourceMatch) {
+      btn.innerHTML = '<span>⏳</span> Copying questionnaire…';
+      try {
+        const copyResp = await fetch(`https://www.googleapis.com/drive/v3/files/${sourceMatch[1]}/copy`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${googleToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: `Questionnaire_${filename}`,
+            parents: [folderId]
+          })
+        });
+        if (copyResp.ok) {
+          const copyData = await copyResp.json();
+          questCopyUrl = `https://drive.google.com/file/d/${copyData.id}/view`;
+        }
+      } catch(copyErr) {
+        // Non-fatal — memo still saved, questionnaire copy failed
+        console.warn('Questionnaire copy failed:', copyErr);
+      }
+    }
+
+    const docUrl = `https://docs.google.com/document/d/${docId}/edit`;
+    const folderUrl = `https://drive.google.com/drive/folders/${folderId}`;
+
+    btn.innerHTML = '<span>✓</span> Saved to Drive';
+    btn.className = 'save-drive-btn saved';
+
+    let successMsg = `✓ Saved to <em>Legal and Compliance / Vendor Documents / ${vendorFolder}</em><br><br>`;
+    successMsg += `📄 <a href="${docUrl}" target="_blank">Open Risk Memo →</a><br>`;
+    if (questCopyUrl) {
+      successMsg += `📋 <a href="${questCopyUrl}" target="_blank">Open Questionnaire Copy →</a><br>`;
+    } else {
+      successMsg += `📋 Questionnaire copy skipped — file may not be copyable with current permissions.<br>`;
+    }
+    successMsg += `<br>📁 <a href="${folderUrl}" target="_blank">Open Vendor Folder in Drive →</a>`;
+
+    showSaveResult('success', successMsg);
+
+  } catch(e) {
+    btn.disabled = false;
+    btn.innerHTML = '<span>📄</span> Create Google Doc in Drive';
+    showSaveResult('error', 'Error saving to Drive: ' + e.message);
+  }
+}
+
+async function ensureFolderPath(parts) {
+  let parentId = 'root';
+  for (const name of parts) {
+    // Search for existing folder
+    const q = encodeURIComponent(`name='${name}' and mimeType='application/vnd.google-apps.folder' and '${parentId}' in parents and trashed=false`);
+    const searchResp = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`, {
+      headers: { 'Authorization': `Bearer ${googleToken}` }
+    });
+    const searchData = await searchResp.json();
+
+    if (searchData.files && searchData.files.length > 0) {
+      parentId = searchData.files[0].id;
+    } else {
+      // Create folder
+      const createResp = await fetch('https://www.googleapis.com/drive/v3/files', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${googleToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name,
+          mimeType: 'application/vnd.google-apps.folder',
+          parents: [parentId]
+        })
+      });
+      const folder = await createResp.json();
+      parentId = folder.id;
+    }
+  }
+  return parentId;
+}
+
+// ── HELPERS ──────────────────────────────────────────────────────
+function parseSections(text) {
+  const out = {};
+  const re = /###\s+([A-Z][A-Z0-9 &\/—\-]+)\n([\s\S]*?)(?=###\s+[A-Z]|$)/g;
+  let m;
+  while ((m = re.exec(text)) !== null) {
+    out[m[1].trim()] = m[2].trim();
+  }
+  return out;
+}
+
+function extractTier(text, type) {
+  const section = type === 'INHERENT' ? 'RISK TIER' : 'RESIDUAL RISK';
+  const re = new RegExp(`### ${section}[\\s\\S]*?\\n([\\s\\S]*?)(?=###|$)`);
+  const match = text.match(re);
+  const chunk = match ? match[1] : text;
+  if (/\bHigh\b/i.test(chunk)) return 'High';
+  if (/\bMedium\b/i.test(chunk)) return 'Medium';
+  if (/\bLow\b/i.test(chunk)) return 'Low';
+  return 'Unknown';
+}
+
+function extractCriticality(text) {
+  const re = /### CRITICALITY ASSESSMENT[\s\S]*?\n([\s\S]*?)(?=###|$)/;
+  const match = text.match(re);
+  const chunk = match ? match[1] : text;
+  if (/REQUIRES\s+INTERNAL\s+INPUT/i.test(chunk)) return 'Requires Input';
+  if (/Non-Critical/i.test(chunk)) return 'Non-Critical';
+  if (/\bCritical\b/i.test(chunk)) return 'Critical';
+  return 'Unknown';
+}
+
+function toggleSec(head) {
+  head.classList.toggle('open');
+  head.nextElementSibling.classList.toggle('open');
+}
+
+function copyText(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.classList.add('copied');
+    btn.innerHTML = '✓ Copied';
+    setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = '⎘ Copy'; }, 2000);
+  });
+}
+
+function copyFilename(btn) {
+  navigator.clipboard.writeText(document.getElementById('filenamePill').textContent).then(() => {
+    btn.classList.add('copied');
+    btn.textContent = '✓';
+    setTimeout(() => { btn.classList.remove('copied'); btn.textContent = 'Copy'; }, 2000);
+  });
+}
+
+function showSaveResult(type, msg) {
+  const el = document.getElementById('saveResult');
+  el.className = `save-result ${type}`;
+  el.innerHTML = msg;
+}
+
+function setLoading(on, msg = '') {
+  document.getElementById('loadingWrap').classList.toggle('visible', on);
+  if (msg) document.getElementById('loadingLabel').textContent = msg;
+  document.getElementById('runBtn').disabled = on;
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorBox');
+  el.style.whiteSpace = 'pre-line';
+  el.textContent = msg;
+  el.classList.add('visible');
+}
+
+function hideError() {
+  document.getElementById('errorBox').classList.remove('visible');
+}
+
+function setStep(n) {
+  [1,2,3].forEach(i => {
+    const el = document.getElementById(`step${i}`);
+    el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+  });
+}
+
+function resetApp() {
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('results').classList.remove('visible');
+  document.getElementById('inputCard').style.display = '';
+  document.getElementById('vendorName').value = '';
+  document.getElementById('driveLink').value = '';
+  document.getElementById('serviceDesc').value = '';
+  document.getElementById('saveResult').className = 'save-result';
+  document.getElementById('saveDriveBtn').disabled = false;
+  document.getElementById('saveDriveBtn').innerHTML = '<span>📄</span> Create Google Doc in Drive';
+  document.getElementById('saveDriveBtn').className = 'save-drive-btn';
+  hideError();
+  checkReady();
+  setStep(1);
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function esc(s) {
+  return s.replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/\$/g,'\\$');
+}
+
+// ── INIT ─────────────────────────────────────────────────────────
+initGoogleAuth();
+</script>
+</body>
+</html>
