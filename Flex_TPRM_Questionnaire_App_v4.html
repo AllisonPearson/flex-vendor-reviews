@@ -1,0 +1,1874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flex · Vendor Risk Assessment</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F7F5F0;
+  --bg2: #EDEAE3;
+  --ink: #1A1714;
+  --ink2: #4A4540;
+  --ink3: #8A8078;
+  --accent: #1A3A2A;
+  --accent2: #2D6B47;
+  --accent-light: #E8F0EB;
+  --gold: #C8902A;
+  --gold-light: #FDF4E3;
+  --red: #C0392B;
+  --red-light: #FDECEA;
+  --border: #D8D4CC;
+  --border2: #C5C0B8;
+  --white: #FFFFFF;
+  --shadow: 0 2px 12px rgba(26,23,20,0.08);
+  --shadow-lg: 0 8px 32px rgba(26,23,20,0.12);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'IBM Plex Sans', sans-serif;
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+  background: var(--accent);
+  padding: 14px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow);
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #fff;
+}
+
+.topbar-logo {
+  width: 32px; height: 32px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.topbar-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.topbar-sub {
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.step-indicator {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 0.08em;
+}
+
+/* ── PROGRESS ── */
+.progress-bar {
+  height: 3px;
+  background: var(--bg2);
+  position: sticky;
+  top: 60px;
+  z-index: 99;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--accent2);
+  transition: width 0.4s ease;
+}
+
+/* ── LAYOUT ── */
+.container {
+  max-width: 740px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+/* ── PAGE TITLE ── */
+.page-title {
+  margin-bottom: 40px;
+}
+
+.page-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent2);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-eyebrow::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: var(--accent2);
+}
+
+.page-title h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 38px;
+  font-weight: 400;
+  line-height: 1.15;
+  color: var(--ink);
+  margin-bottom: 14px;
+}
+
+.page-title h1 em {
+  font-style: italic;
+  color: var(--accent2);
+}
+
+.page-title p {
+  font-size: 15px;
+  color: var(--ink2);
+  line-height: 1.7;
+  max-width: 560px;
+}
+
+/* ── SECTION ── */
+.section {
+  margin-bottom: 36px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.section-desc {
+  font-size: 13px;
+  color: var(--ink3);
+  margin-top: 2px;
+  font-weight: 400;
+  font-family: 'IBM Plex Sans', sans-serif;
+}
+
+/* ── FIELD ── */
+.field {
+  margin-bottom: 20px;
+}
+
+.field-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 6px;
+  letter-spacing: 0.01em;
+}
+
+.field-label .required {
+  color: var(--red);
+  margin-left: 3px;
+}
+
+.field-hint {
+  font-size: 12px;
+  color: var(--ink3);
+  margin-bottom: 8px;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.field-input, .field-select, .field-textarea {
+  width: 100%;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 14px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  -webkit-appearance: none;
+}
+
+.field-input:focus, .field-select:focus, .field-textarea:focus {
+  border-color: var(--accent2);
+  box-shadow: 0 0 0 3px rgba(45,107,71,0.1);
+}
+
+.field-input::placeholder, .field-textarea::placeholder { color: var(--ink3); }
+.field-select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238A8078' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+.field-select option { background: #fff; }
+.field-textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+
+.field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* ── RADIO / CHECKBOX GROUPS ── */
+.radio-group, .check-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.radio-option, .check-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+
+.radio-option:hover, .check-option:hover {
+  border-color: var(--accent2);
+  background: var(--accent-light);
+}
+
+.radio-option.selected, .check-option.selected {
+  border-color: var(--accent2);
+  background: var(--accent-light);
+}
+
+.radio-option input, .check-option input {
+  margin-top: 2px;
+  flex-shrink: 0;
+  accent-color: var(--accent2);
+  width: 16px; height: 16px;
+  cursor: pointer;
+}
+
+.radio-label, .check-label {
+  font-size: 14px;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.radio-label strong { display: block; font-weight: 600; }
+.radio-label span { font-size: 12px; color: var(--ink3); }
+
+/* ── UPLOAD ZONE ── */
+.upload-zone {
+  border: 2px dashed var(--border2);
+  border-radius: 10px;
+  padding: 28px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--white);
+  position: relative;
+}
+
+.upload-zone:hover {
+  border-color: var(--accent2);
+  background: var(--accent-light);
+}
+
+.upload-zone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+.upload-icon { font-size: 28px; margin-bottom: 8px; }
+.upload-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+.upload-hint { font-size: 12px; color: var(--ink3); }
+
+.upload-preview {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  background: var(--accent-light);
+  border: 1px solid var(--accent2);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--accent);
+}
+
+.upload-preview.visible { display: flex; }
+.upload-preview-name { flex: 1; font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+.upload-remove { background: none; border: none; color: var(--ink3); cursor: pointer; font-size: 18px; line-height: 1; padding: 0; transition: color 0.15s; }
+.upload-remove:hover { color: var(--red); }
+
+/* ── DIVIDER ── */
+.divider { height: 1px; background: var(--border); margin: 32px 0; }
+
+/* ── NOTICE BOX ── */
+.notice {
+  background: var(--gold-light);
+  border: 1px solid #E8C880;
+  border-left: 3px solid var(--gold);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 13px;
+  color: #7A5A10;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.notice strong { color: #5A4008; }
+
+/* ── SUBMIT AREA ── */
+.submit-area {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 32px;
+  margin-top: 40px;
+  box-shadow: var(--shadow);
+}
+
+.submit-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--ink);
+}
+
+.submit-desc {
+  font-size: 14px;
+  color: var(--ink2);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 16px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  letter-spacing: 0.02em;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: var(--accent2);
+  box-shadow: 0 4px 20px rgba(26,58,42,0.25);
+  transform: translateY(-1px);
+}
+
+.submit-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+/* ── LOADING ── */
+.loading-area { display: none; margin-top: 20px; }
+.loading-area.visible { display: block; }
+
+.loading-track {
+  height: 3px;
+  background: var(--bg2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.loading-fill {
+  height: 100%;
+  background: var(--accent2);
+  border-radius: 3px;
+  animation: sweep 1.8s ease-in-out infinite;
+  width: 35%;
+}
+
+@keyframes sweep {
+  0% { transform: translateX(-150%); }
+  100% { transform: translateX(400%); }
+}
+
+.loading-label {
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink3);
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 0.05em;
+}
+
+/* ── ERROR ── */
+.error-box {
+  background: var(--red-light);
+  border: 1px solid #F5C6C2;
+  border-left: 3px solid var(--red);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 13px;
+  color: var(--red);
+  margin-top: 16px;
+  display: none;
+  white-space: pre-line;
+  line-height: 1.6;
+}
+
+.error-box.visible { display: block; }
+
+/* ── RESULTS ── */
+#resultsView { display: none; }
+#resultsView.visible { display: block; }
+
+.results-hero {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 14px;
+  padding: 36px;
+  margin-bottom: 28px;
+  position: relative;
+  overflow: hidden;
+}
+
+.results-hero::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+}
+
+.results-hero-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 10px;
+}
+
+.results-hero-vendor {
+  font-family: 'Playfair Display', serif;
+  font-size: 30px;
+  font-weight: 400;
+  margin-bottom: 20px;
+}
+
+.results-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rbadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 13px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.rbadge-high { background: rgba(192,57,43,0.2); color: #FF8A80; border: 1px solid rgba(192,57,43,0.4); }
+.rbadge-medium { background: rgba(200,144,42,0.2); color: #FFD080; border: 1px solid rgba(200,144,42,0.4); }
+.rbadge-low { background: rgba(45,107,71,0.3); color: #80E8A8; border: 1px solid rgba(45,107,71,0.4); }
+.rbadge-critical { background: rgba(192,57,43,0.15); color: #FFB3AD; border: 1px solid rgba(192,57,43,0.3); }
+.rbadge-noncritical { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.85); border: 1px solid rgba(255,255,255,0.2); }
+
+/* ── RESULT SECTIONS ── */
+.result-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.result-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+
+.result-card-head:hover { background: var(--bg); }
+.result-card-head.open { border-bottom: 1px solid var(--border); }
+
+.result-card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink2);
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.result-card-num {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--accent-light);
+  color: var(--accent2);
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-weight: 700;
+}
+
+.result-chevron {
+  color: var(--ink3);
+  font-size: 11px;
+  transition: transform 0.2s;
+}
+
+.result-card-head.open .result-chevron { transform: rotate(180deg); }
+
+.result-card-body {
+  display: none;
+  padding: 20px;
+}
+
+.result-card-body.open { display: block; }
+
+.result-content {
+  font-size: 14px;
+  line-height: 1.85;
+  color: var(--ink2);
+  white-space: pre-wrap;
+}
+
+.result-memo {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  line-height: 1.9;
+  color: var(--ink2);
+  white-space: pre-wrap;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  word-break: break-word;
+}
+
+.result-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+
+.copy-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--ink3);
+  padding: 7px 14px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.copy-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+.copy-btn.copied { border-color: var(--accent); color: var(--accent); }
+
+/* ── SAVE TO DRIVE ── */
+.save-card {
+  background: var(--accent-light);
+  border: 1px solid #A8D4B8;
+  border-radius: 14px;
+  padding: 28px;
+  margin-top: 20px;
+}
+
+.save-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.save-card-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.save-card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.save-card-sub {
+  font-size: 12px;
+  color: var(--accent2);
+  font-family: 'IBM Plex Mono', monospace;
+  margin-top: 2px;
+}
+
+.folder-path {
+  background: var(--white);
+  border: 1px solid #A8D4B8;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--accent2);
+  margin-bottom: 14px;
+  word-break: break-all;
+}
+
+.filename-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.filename-pill {
+  flex: 1;
+  background: var(--white);
+  border: 1px solid #A8D4B8;
+  border-radius: 8px;
+  padding: 9px 13px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--ink2);
+  min-width: 200px;
+}
+
+.save-btn {
+  width: 100%;
+  padding: 15px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.save-btn:hover:not(:disabled) {
+  background: var(--accent2);
+  box-shadow: 0 4px 20px rgba(26,58,42,0.2);
+  transform: translateY(-1px);
+}
+
+.save-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.save-btn.saved { background: #2E7D32; cursor: default; }
+
+.save-result {
+  display: none;
+  margin-top: 14px;
+  padding: 13px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.save-result.success {
+  display: block;
+  background: #E8F5E9;
+  border: 1px solid #A5D6A7;
+  color: #2E7D32;
+}
+
+.save-result.error {
+  display: block;
+  background: var(--red-light);
+  border: 1px solid #F5C6C2;
+  color: var(--red);
+}
+
+.save-result a { color: var(--accent2); text-decoration: underline; cursor: pointer; }
+.save-result em { font-style: normal; font-weight: 600; }
+
+.new-review-btn {
+  background: none;
+  border: 1px solid var(--border2);
+  color: var(--ink2);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-top: 16px;
+}
+
+.new-review-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+/* ── VALIDATION ── */
+.field-input.invalid, .field-select.invalid, .field-textarea.invalid {
+  border-color: var(--red);
+}
+
+.validation-msg {
+  font-size: 12px;
+  color: var(--red);
+  margin-top: 4px;
+  display: none;
+}
+
+.validation-msg.visible { display: block; }
+
+@media (max-width: 600px) {
+  .topbar { padding: 12px 20px; }
+  .container { padding: 32px 16px 60px; }
+  .page-title h1 { font-size: 28px; }
+  .field-grid { grid-template-columns: 1fr; }
+  .results-hero { padding: 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-logo">🏛</div>
+    <div>
+      <div class="topbar-name">Flexbase</div>
+      <div class="topbar-sub">Third Party Risk Management</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="step-indicator" id="stepIndicator">Step 1 of 6</div>
+  </div>
+</div>
+
+<!-- Progress bar -->
+<div class="progress-bar">
+  <div class="progress-fill" id="progressFill" style="width:17%"></div>
+</div>
+
+<!-- ── QUESTIONNAIRE VIEW ── -->
+<div id="questionnaireView">
+<div class="container">
+
+  <div class="page-title">
+    <div class="page-eyebrow">Vendor Risk Assessment</div>
+    <h1>Third-Party <em>Due Diligence</em><br>Questionnaire</h1>
+    <p>Complete all sections to initiate a TPRM review. Your submission will be assessed by Claude and reviewed by the Compliance team per Flex's Third-Party Risk Management Policy.</p>
+  </div>
+
+  <!-- SECTION 1: Vendor Information -->
+  <div class="section" id="sec1">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div>
+        <div class="section-title">Vendor Information</div>
+        <div class="section-desc">Basic details about the third party being assessed</div>
+      </div>
+    </div>
+
+    <div class="field-grid">
+      <div class="field">
+        <label class="field-label">Vendor / Company Name <span class="required">*</span></label>
+        <input type="text" class="field-input" id="vendorName" placeholder="Legal entity name" />
+      </div>
+      <div class="field">
+        <label class="field-label">Relationship Type <span class="required">*</span></label>
+        <select class="field-select" id="relType">
+          <option value="">Select...</option>
+          <option value="New">New Vendor</option>
+          <option value="Renewal">Contract Renewal</option>
+          <option value="Expansion">Existing — New Product/Service</option>
+          <option value="Ongoing">Ongoing Review</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Submitter Name <span class="required">*</span></label>
+      <input type="text" class="field-input" id="submitterName" placeholder="Your full name" />
+    </div>
+
+    <div class="field">
+      <label class="field-label">Submitter Department / Team</label>
+      <input type="text" class="field-input" id="submitterDept" placeholder="e.g. Product, Engineering, Finance" />
+    </div>
+
+    <div class="field">
+      <label class="field-label">Product / Service Description <span class="required">*</span></label>
+      <div class="field-hint">Describe what this vendor provides to Flex and how it will be used</div>
+      <textarea class="field-textarea" id="serviceDesc" placeholder="e.g. Cloud-based identity verification platform used for KYC during customer onboarding..."></textarea>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Vendor Website</label>
+      <input type="url" class="field-input" id="vendorWebsite" placeholder="https://vendor.com" />
+    </div>
+
+    <div class="field-grid">
+      <div class="field">
+        <label class="field-label">Trust Center URL</label>
+        <div class="field-hint">Link to vendor's security/trust documentation</div>
+        <input type="url" class="field-input" id="trustCenter" placeholder="https://trust.vendor.com" />
+      </div>
+      <div class="field">
+        <label class="field-label">Privacy Policy URL</label>
+        <input type="url" class="field-input" id="privacyPolicy" placeholder="https://vendor.com/privacy" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Estimated Annual Contract Value</label>
+      <select class="field-select" id="contractValue">
+        <option value="">Select range...</option>
+        <option value="Under $10K">Under $10,000</option>
+        <option value="$10K–$50K">$10,000 – $50,000</option>
+        <option value="$50K–$250K">$50,000 – $250,000</option>
+        <option value="Over $250K">Over $250,000</option>
+        <option value="Unknown">Unknown / TBD</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 2: Risk Profile -->
+  <div class="section" id="sec2">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <div>
+        <div class="section-title">Risk Profile</div>
+        <div class="section-desc">Used to determine inherent risk tier and criticality per Flex TPRM Policy</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Does this vendor access, process, or store Flex customer PII? <span class="required">*</span></label>
+      <div class="radio-group" id="piiAccess">
+        <label class="radio-option" onclick="selectRadio(this)">
+          <input type="radio" name="piiAccess" value="Yes — direct access to customer PII (SSN, DOB, financial data)" />
+          <div class="radio-label"><strong>Yes — direct access to sensitive PII</strong><span>Includes SSN, date of birth, financial account data, government IDs</span></div>
+        </label>
+        <label class="radio-option" onclick="selectRadio(this)">
+          <input type="radio" name="piiAccess" value="Yes — limited/indirect access to customer PII" />
+          <div class="radio-label"><strong>Yes — limited or indirect access</strong><span>May see some customer data but not core sensitive fields</span></div>
+        </label>
+        <label class="radio-option" onclick="selectRadio(this)">
+          <input type="radio" name="piiAccess" value="No — no customer PII access" />
+          <div class="radio-label"><strong>No — no customer PII access</strong><span>Internal tools, infrastructure, or services only</span></div>
+        </label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Is this vendor involved in payment processing or transaction flows? <span class="required">*</span></label>
+      <div class="radio-group" id="paymentInvolvement">
+        <label class="radio-option" onclick="selectRadio(this)">
+          <input type="radio" name="paymentInvolvement" value="Yes — directly processes or routes payments" />
+          <div class="radio-label"><strong>Yes — directly processes or routes payments</strong></div>
+        </label>
+        <label class="radio-option" onclick="selectRadio(this)">
+          <input type="radio" name="paymentInvolvement" value="Yes — indirectly involved in payment infrastructure" />
+          <div class="radio-label"><strong>Yes — indirectly involved in payment infrastructure</strong></div>
+        </label>
+        <label class="radio-option" onclick="selectRadio(this)">
+          <input type="radio" name="paymentInvolvement" value="No — not involved in payment flows" />
+          <div class="radio-label"><strong>No — not involved in payment flows</strong></div>
+        </label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Does this vendor have direct interaction with Flex customers? <span class="required">*</span></label>
+      <div class="radio-group" id="customerInteraction">
+        <label class="radio-option" onclick="selectRadio(this)">
+          <input type="radio" name="customerInteraction" value="Yes — directly interacts with end customers" />
+          <div class="radio-label"><strong>Yes — directly interacts with Flex end customers</strong></div>
+        </label>
+        <label class="radio-option" onclick="selectRadio(this)">
+          <input type="radio" name="customerInteraction" value="No — no direct customer interaction" />
+          <div class="radio-label"><strong>No — no direct customer interaction</strong></div>
+        </label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Substitutability — If this vendor were suddenly unavailable, how easily could Flex replace them? <span class="required">*</span></label>
+      <div class="radio-group" id="substitutability">
+        <label class="radio-option" onclick="selectRadio(this)">
+          <input type="radio" name="substitutability" value="Not replaceable — sole provider or deeply integrated, disruption would exceed 24 hours" />
+          <div class="radio-label"><strong>Not replaceable</strong><span>Sole provider or so deeply integrated that disruption would exceed 24 hours and significantly impact operations</span></div>
+        </label>
+        <label class="radio-option" onclick="selectRadio(this)">
+          <input type="radio" name="substitutability" value="Difficult to replace — alternatives exist but transition would take significant time or resources" />
+          <div class="radio-label"><strong>Difficult to replace</strong><span>Alternatives exist but transition would take significant time or resources</span></div>
+        </label>
+        <label class="radio-option" onclick="selectRadio(this)">
+          <input type="radio" name="substitutability" value="Easily replaceable — multiple alternatives available with minimal disruption" />
+          <div class="radio-label"><strong>Easily replaceable</strong><span>Multiple alternatives available with minimal disruption to Flex operations</span></div>
+        </label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Does this vendor access Flex's partner bank networks, systems, or infrastructure? <span class="required">*</span></label>
+      <div class="radio-group" id="bankNetworkAccess">
+        <label class="radio-option" onclick="selectRadio(this)">
+          <input type="radio" name="bankNetworkAccess" value="Yes" />
+          <div class="radio-label"><strong>Yes</strong></div>
+        </label>
+        <label class="radio-option" onclick="selectRadio(this)">
+          <input type="radio" name="bankNetworkAccess" value="No" />
+          <div class="radio-label"><strong>No</strong></div>
+        </label>
+        <label class="radio-option" onclick="selectRadio(this)">
+          <input type="radio" name="bankNetworkAccess" value="Unknown" />
+          <div class="radio-label"><strong>Unknown</strong></div>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 3: Information Security / SOC 2 -->
+  <div class="section" id="sec3">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <div>
+        <div class="section-title">Information Security</div>
+        <div class="section-desc">Cybersecurity controls and certifications</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Does the vendor have a current SOC 2 Type II report? <span class="required">*</span></label>
+      <select class="field-select" id="soc2Status">
+        <option value="">Select...</option>
+        <option value="Yes — SOC 2 Type II, report available">Yes — SOC 2 Type II (report available)</option>
+        <option value="Yes — SOC 2 Type I only">Yes — SOC 2 Type I only</option>
+        <option value="In progress — SOC 2 audit underway">In progress — SOC 2 audit underway</option>
+        <option value="No — alternative certifications (ISO 27001, PCI DSS, etc.)">No — but holds alternative certification (ISO 27001, PCI-DSS, etc.)</option>
+        <option value="No certifications">No certifications</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Upload SOC 2 Report or Security Certification</label>
+      <div class="field-hint">PDF preferred. If unavailable, provide a Trust Center link above.</div>
+      <div class="upload-zone" id="soc2UploadZone">
+        <input type="file" id="soc2File" accept=".pdf,.doc,.docx" onchange="handleFileUpload('soc2File','soc2Preview','soc2FileName')" />
+        <div class="upload-icon">📄</div>
+        <div class="upload-title">Click or drag to upload</div>
+        <div class="upload-hint">PDF, DOC, DOCX — max 20MB</div>
+      </div>
+      <div class="upload-preview" id="soc2Preview">
+        <span>📎</span>
+        <span class="upload-preview-name" id="soc2FileName"></span>
+        <button class="upload-remove" onclick="removeFile('soc2File','soc2Preview','soc2FileName')">×</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 4: BSA/AML & Financial Crime Controls -->
+  <div class="section" id="sec4">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <div>
+        <div class="section-title">BSA / AML & Financial Crime</div>
+        <div class="section-desc">Anti-money laundering, sanctions screening, and financial crime compliance</div>
+      </div>
+    </div>
+
+    <div class="notice">
+      <strong>Note:</strong> This section applies to vendors involved in payment processing, transaction monitoring, KYC/identity verification, or any function with financial crime risk exposure. If not applicable, indicate so in each field.
+    </div>
+
+    <div class="field">
+      <label class="field-label">Does the vendor maintain a formal BSA/AML compliance program? <span class="required">*</span></label>
+      <select class="field-select" id="amlProgram">
+        <option value="">Select...</option>
+        <option value="Yes — formal program, independently audited">Yes — formal program, independently audited</option>
+        <option value="Yes — formal program, not independently audited">Yes — formal program, not independently audited</option>
+        <option value="Not applicable — vendor has no financial crime exposure">Not applicable — no financial crime exposure</option>
+        <option value="No">No</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Does the vendor screen against OFAC, FinCEN, and other sanctions/watchlists? <span class="required">*</span></label>
+      <select class="field-select" id="ofacScreening">
+        <option value="">Select...</option>
+        <option value="Yes — real-time screening against OFAC and other lists">Yes — real-time screening</option>
+        <option value="Yes — periodic batch screening">Yes — periodic batch screening</option>
+        <option value="Not applicable">Not applicable</option>
+        <option value="No">No</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Additional BSA/AML compliance notes or context</label>
+      <textarea class="field-textarea" id="amlNotes" placeholder="Any additional information relevant to financial crime compliance..."></textarea>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 5: Data Privacy -->
+  <div class="section" id="sec5">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <div>
+        <div class="section-title">Data Privacy</div>
+        <div class="section-desc">CCPA, GDPR, and PII handling practices</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">What categories of PII does the vendor access, process, or store on behalf of Flex? <span class="required">*</span></label>
+      <div class="check-group" id="piiCategories">
+        <label class="check-option" onclick="toggleCheck(this)">
+          <input type="checkbox" value="Government-issued IDs (SSN, passport, driver's license)" />
+          <span class="check-label">Government-issued IDs (SSN, passport, driver's license)</span>
+        </label>
+        <label class="check-option" onclick="toggleCheck(this)">
+          <input type="checkbox" value="Financial account data (account numbers, routing numbers, card data)" />
+          <span class="check-label">Financial account data (account numbers, routing numbers, card data)</span>
+        </label>
+        <label class="check-option" onclick="toggleCheck(this)">
+          <input type="checkbox" value="Contact information (name, email, phone, address)" />
+          <span class="check-label">Contact information (name, email, phone, address)</span>
+        </label>
+        <label class="check-option" onclick="toggleCheck(this)">
+          <input type="checkbox" value="Transaction history and financial behavior data" />
+          <span class="check-label">Transaction history and financial behavior data</span>
+        </label>
+        <label class="check-option" onclick="toggleCheck(this)">
+          <input type="checkbox" value="Biometric data" />
+          <span class="check-label">Biometric data</span>
+        </label>
+        <label class="check-option" onclick="toggleCheck(this)">
+          <input type="checkbox" value="No PII — does not access customer personal data" />
+          <span class="check-label">No PII — does not access customer personal data</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Does the vendor use subcontractors who may access Flex data? <span class="required">*</span></label>
+      <div class="radio-group" id="subcontractors">
+        <label class="radio-option" onclick="selectRadio(this)">
+          <input type="radio" name="subcontractors" value="Yes — subcontractors used, formally vetted and contractually bound" />
+          <div class="radio-label"><strong>Yes — subcontractors used and formally vetted</strong><span>Subcontractors are contractually bound to the same data protection standards</span></div>
+        </label>
+        <label class="radio-option" onclick="selectRadio(this)">
+          <input type="radio" name="subcontractors" value="Yes — subcontractors used, vetting process unclear" />
+          <div class="radio-label"><strong>Yes — subcontractors used, vetting process unclear</strong></div>
+        </label>
+        <label class="radio-option" onclick="selectRadio(this)">
+          <input type="radio" name="subcontractors" value="No — no subcontractors access Flex data" />
+          <div class="radio-label"><strong>No — no subcontractors access Flex data</strong></div>
+        </label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Will Flex data be stored or transmitted outside of the United States? <span class="required">*</span></label>
+      <div class="radio-group" id="dataOverseas">
+        <label class="radio-option" onclick="selectRadio(this)">
+          <input type="radio" name="dataOverseas" value="Yes — data stored or transmitted outside the US" />
+          <div class="radio-label"><strong>Yes — data will be stored or transmitted outside the US</strong></div>
+        </label>
+        <label class="radio-option" onclick="selectRadio(this)">
+          <input type="radio" name="dataOverseas" value="No — data remains within the United States" />
+          <div class="radio-label"><strong>No — data remains within the United States only</strong></div>
+        </label>
+        <label class="radio-option" onclick="selectRadio(this)">
+          <input type="radio" name="dataOverseas" value="Unknown" />
+          <div class="radio-label"><strong>Unknown</strong></div>
+        </label>
+      </div>
+    </div>
+
+    <div class="field" id="overseasDetailField" style="display:none">
+      <label class="field-label">Which countries or regions will Flex data be stored or transmitted to? <span class="required">*</span></label>
+      <div class="field-hint">List all countries or regions where data may reside or be transmitted through, including cloud infrastructure regions</div>
+      <textarea class="field-textarea" id="overseasCountries" placeholder="e.g. European Union (Ireland, Germany), Canada, India — via AWS EU-WEST-1 and AP-SOUTH-1 regions..."></textarea>
+    </div>
+
+    <div class="field" id="overseasSafeguardsField" style="display:none">
+      <label class="field-label">What legal mechanisms or safeguards govern the international data transfer?</label>
+      <div class="field-hint">e.g. Standard Contractual Clauses (SCCs), adequacy decisions, Binding Corporate Rules, or other transfer mechanisms</div>
+      <select class="field-select" id="overseasSafeguards">
+        <option value="">Select...</option>
+        <option value="Standard Contractual Clauses (SCCs)">Standard Contractual Clauses (SCCs)</option>
+        <option value="EU-US Data Privacy Framework">EU-US Data Privacy Framework</option>
+        <option value="Binding Corporate Rules (BCRs)">Binding Corporate Rules (BCRs)</option>
+        <option value="Adequacy decision applies">Adequacy decision applies</option>
+        <option value="No formal transfer mechanism in place">No formal transfer mechanism in place</option>
+        <option value="Unknown / not yet determined">Unknown / not yet determined</option>
+      </select>
+    </div>
+
+    <div class="field" id="overseasEncryptionField" style="display:none">
+      <label class="field-label">Is data encrypted in transit when crossing international borders?</label>
+      <div class="radio-group" id="overseasEncryption">
+        <label class="radio-option" onclick="selectRadio(this)">
+          <input type="radio" name="overseasEncryption" value="Yes — encrypted in transit across all borders" />
+          <div class="radio-label"><strong>Yes — encrypted in transit across all borders</strong></div>
+        </label>
+        <label class="radio-option" onclick="selectRadio(this)">
+          <input type="radio" name="overseasEncryption" value="Partial — encrypted in some but not all cross-border transfers" />
+          <div class="radio-label"><strong>Partial — not all cross-border transfers are encrypted</strong></div>
+        </label>
+        <label class="radio-option" onclick="selectRadio(this)">
+          <input type="radio" name="overseasEncryption" value="Unknown" />
+          <div class="radio-label"><strong>Unknown</strong></div>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 6: Additional Context -->
+  <div class="section" id="sec6">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <div>
+        <div class="section-title">Additional Context</div>
+        <div class="section-desc">Supporting information and any other relevant details</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Is there an existing contract or MSA in place?</label>
+      <div class="radio-group" id="contractStatus">
+        <label class="radio-option" onclick="selectRadio(this)">
+          <input type="radio" name="contractStatus" value="Yes — executed contract in place" />
+          <div class="radio-label"><strong>Yes — executed contract in place</strong></div>
+        </label>
+        <label class="radio-option" onclick="selectRadio(this)">
+          <input type="radio" name="contractStatus" value="In negotiation — contract being drafted or reviewed" />
+          <div class="radio-label"><strong>In negotiation</strong></div>
+        </label>
+        <label class="radio-option" onclick="selectRadio(this)">
+          <input type="radio" name="contractStatus" value="No — no contract yet" />
+          <div class="radio-label"><strong>No — no contract yet</strong></div>
+        </label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Are there any known compliance, legal, or reputational concerns about this vendor?</label>
+      <textarea class="field-textarea" id="complianceConcerns" placeholder="Any media coverage, regulatory scrutiny, litigation, or other concerns you are aware of..."></textarea>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Any additional information for the Compliance team</label>
+      <textarea class="field-textarea" id="additionalNotes" placeholder="Anything else that would help the Compliance team assess this vendor..."></textarea>
+    </div>
+  </div>
+
+  <!-- Submit -->
+  <div class="submit-area">
+    <div class="submit-title">Ready to submit?</div>
+    <div class="submit-desc">Your responses will be reviewed by Claude against Flex's TPRM Policy and assessed for inherent risk, residual risk, and criticality. The Compliance team will be notified via Slack and all documentation will be saved to the Legal and Compliance Drive.</div>
+    <button class="submit-btn" id="submitBtn" onclick="submitReview()">
+      <span>Submit for TPRM Review</span>
+      <span>→</span>
+    </button>
+    <div class="loading-area" id="loadingArea">
+      <div class="loading-track"><div class="loading-fill"></div></div>
+      <div class="loading-label" id="loadingLabel">Running TPRM assessment...</div>
+    </div>
+    <div class="error-box" id="errorBox"></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ── RESULTS VIEW ── -->
+<div id="resultsView">
+<div class="container">
+
+  <div class="results-hero">
+    <div class="results-hero-eyebrow">TPRM Review Complete</div>
+    <div class="results-hero-vendor" id="resultsVendorName">Vendor Name</div>
+    <div class="results-badge-row" id="resultsBadgeRow"></div>
+  </div>
+
+  <div id="resultSectionsContainer"></div>
+
+  <div class="save-card" id="saveCard">
+    <div class="save-card-header">
+      <div class="save-card-icon">📁</div>
+      <div>
+        <div class="save-card-title">Save to Google Drive</div>
+        <div class="save-card-sub" id="saveSub">Creates folder + Google Doc automatically</div>
+      </div>
+    </div>
+    <div class="folder-path" id="folderPath">Legal and Compliance / Vendor Documents / …</div>
+    <div class="filename-row">
+      <div class="filename-pill" id="filenamePill">TPRM_Vendor_…</div>
+      <button class="copy-btn" onclick="copyFilename(this)">Copy</button>
+    </div>
+    <button class="save-btn" id="saveDriveBtn" onclick="saveToDrive()">
+      <span>📄</span> Create Google Doc in Drive
+    </button>
+    <div class="save-result" id="saveResult"></div>
+  </div>
+
+  <button class="new-review-btn" onclick="resetApp()">+ Submit Another Vendor</button>
+
+</div>
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────────
+const WORKER_URL = 'https://flex-tprm-proxy.allison-pearson.workers.dev/';
+const GOOGLE_CLIENT_ID = '856498633121-cutsocagcmdpradr5qtd2at9p2tr1tio.apps.googleusercontent.com';
+const SCOPES = 'https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/documents';
+
+const SYSTEM_PROMPT = `You are a compliance risk analyst for Flexbase Technologies, Inc. (Flex), a fintech company offering credit and charge card programs. You specialize in Third Party Risk Management (TPRM) per Flex's formal TPRM Policy, which is based on Interagency Guidance on Third-Party Relationships from the Federal Reserve, FDIC, and OCC.
+
+FLEX TPRM POLICY CONTEXT:
+Risk Ratings: Low (minimal risk, minimal PII access), Moderate (some risk, limited PII access, standard oversight), High (significant risk, regular PII/customer access, enhanced due diligence required)
+Criticality: Critical = sole provider or deeply integrated, sudden loss causes significant disruption or regulatory scrutiny, or service disruption exceeds 24 hours. Non-Critical = replaceable without significant disruption.
+Residual Risk: Inherent risk adjusted by strength of vendor's documented controls. Strong controls may reduce tier; gaps keep it at or above inherent.
+Notwithstanding any other factors, any third party with regular access to or interaction with customers and confidential customer information is automatically High Risk.
+Any third party that directly interacts with end users, accesses partner bank networks, or whose failure would undermine Flex's legal/regulatory obligations is Critical.
+
+YOUR TASK:
+Produce a structured TPRM Review using EXACTLY these section headers:
+
+### VENDOR PROFILE SUMMARY
+One paragraph: what the vendor does, why being assessed, key risk factors at a glance.
+State: Inherent Risk | Residual Risk | Criticality | Combined Profile
+
+### RISK TIER — INHERENT
+State tier (Low/Moderate/High) and full rationale referencing specific questionnaire responses. Apply the automatic High-Risk rule if vendor has regular customer PII access or direct customer interaction.
+
+### CRITICALITY ASSESSMENT
+State Critical or Non-Critical with full rationale. Reference the 24-hour disruption threshold, sole-provider status, and regulatory obligation factors from Flex's policy.
+
+### DOMAIN SCORECARD
+Score each domain 1–5 (5=strong controls, 1=critical gap). For each: Score | Rationale | Evidence from responses.
+Domains:
+- Information Security / SOC 2
+- BSA/AML & Financial Crime Controls
+- Data Privacy (CCPA/GDPR)
+- PII Access & Data Handling
+- Business Continuity & Disaster Recovery
+
+### RESIDUAL RISK
+State tier (Low/Moderate/High). Methodology: start from inherent tier, adjust based on control strength.
+- Avg domain score ≥4, no High-priority gaps → may reduce one tier
+- Avg 2.5–3.9, limited High gaps → unchanged
+- Avg <2.5 or multiple High gaps → at or above inherent
+- Critical vendors need stronger evidence to reduce tier
+Full rationale citing specific controls that reduced or failed to reduce risk.
+
+### GAPS & FLAGS
+Numbered list. Format: [PRIORITY] Description — Domain
+HIGH PRIORITY: any BSA/AML gap, PII gap, breach history without remediation, no BCP, no IRP, regulatory enforcement actions.
+Elevated for Critical vendors: any control gap regardless of domain.
+
+### FOLLOW-UP QUESTIONS
+3–8 targeted questions by priority. Exclude anything clearly answered in the questionnaire.
+
+### RISK MEMO
+TO: Compliance Team, Flexbase Technologies, Inc.
+FROM: TPRM Review System
+DATE: ${new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}
+RE: Third Party Risk Review — [Vendor Name]
+STATUS: DRAFT — Pending Compliance Review
+---
+VENDOR OVERVIEW
+RISK PROFILE (Inherent/Residual/Criticality/Combined)
+INHERENT RISK RATIONALE
+RESIDUAL RISK RATIONALE
+CRITICALITY RATIONALE
+DOMAIN SCORECARD
+FINDINGS SUMMARY
+GAPS & REQUIRED FOLLOW-UP
+OPEN FOLLOW-UP QUESTIONS
+RECOMMENDATION (Approve / Approve with Conditions / Escalate to Management / Reject)
+Reviewer: _________________ Date: _______   Approver: _________________ Date: _______
+
+RULES: Be concise, direct, professional. Cite specific questionnaire responses as evidence. Flag HIGH PRIORITY gaps explicitly. Do not speculate beyond what responses indicate.`;
+
+// ── STATE ────────────────────────────────────────────────────────────
+let googleToken = null;
+let tokenClient = null;
+let reviewData = { text:'', vendor:'', tier:'', residual:'', criticality:'' };
+let uploadedFiles = {};
+
+// ── GOOGLE AUTH ──────────────────────────────────────────────────────
+function initGoogleAuth() {
+  if (!window.google) { setTimeout(initGoogleAuth, 200); return; }
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: GOOGLE_CLIENT_ID,
+    scope: SCOPES,
+    callback: (response) => {
+      if (!response.error) googleToken = response.access_token;
+    }
+  });
+}
+
+// ── UI HELPERS ───────────────────────────────────────────────────────
+function selectRadio(label) {
+  const name = label.querySelector('input').name;
+  document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
+    r.closest('.radio-option').classList.remove('selected');
+  });
+  label.classList.add('selected');
+  label.querySelector('input').checked = true;
+
+  // Conditional fields — overseas data
+  if (name === 'dataOverseas') {
+    const isOverseas = label.querySelector('input').value === 'Yes — data stored or transmitted outside the US';
+    document.getElementById('overseasDetailField').style.display = isOverseas ? 'block' : 'none';
+    document.getElementById('overseasSafeguardsField').style.display = isOverseas ? 'block' : 'none';
+    document.getElementById('overseasEncryptionField').style.display = isOverseas ? 'block' : 'none';
+  }
+}
+
+function toggleCheck(label) {
+  label.classList.toggle('selected');
+  label.querySelector('input').checked = label.classList.contains('selected');
+}
+
+function handleFileUpload(inputId, previewId, nameId) {
+  const file = document.getElementById(inputId).files[0];
+  if (!file) return;
+  uploadedFiles[inputId] = file;
+  document.getElementById(nameId).textContent = file.name;
+  document.getElementById(previewId).classList.add('visible');
+}
+
+function removeFile(inputId, previewId, nameId) {
+  delete uploadedFiles[inputId];
+  document.getElementById(inputId).value = '';
+  document.getElementById(nameId).textContent = '';
+  document.getElementById(previewId).classList.remove('visible');
+}
+
+function updateProgress(step, total) {
+  document.getElementById('progressFill').style.width = `${(step/total)*100}%`;
+  document.getElementById('stepIndicator').textContent = `Step ${step} of ${total}`;
+}
+
+// ── COLLECT FORM DATA ────────────────────────────────────────────────
+function collectFormData() {
+  const get = id => document.getElementById(id)?.value?.trim() || '';
+  const getRadio = name => {
+    const checked = document.querySelector(`input[name="${name}"]:checked`);
+    return checked ? checked.value : 'Not answered';
+  };
+  const getChecks = groupId => {
+    const checked = document.querySelectorAll(`#${groupId} input:checked`);
+    return checked.length > 0
+      ? Array.from(checked).map(c => c.value).join('; ')
+      : 'None selected';
+  };
+
+  return {
+    // Section 1
+    vendorName: get('vendorName'),
+    relType: get('relType'),
+    submitterName: get('submitterName'),
+    submitterDept: get('submitterDept'),
+    serviceDesc: get('serviceDesc'),
+    vendorWebsite: get('vendorWebsite'),
+    trustCenter: get('trustCenter'),
+    privacyPolicy: get('privacyPolicy'),
+    contractValue: get('contractValue'),
+    // Section 2
+    piiAccess: getRadio('piiAccess'),
+    paymentInvolvement: getRadio('paymentInvolvement'),
+    customerInteraction: getRadio('customerInteraction'),
+    substitutability: getRadio('substitutability'),
+    bankNetworkAccess: getRadio('bankNetworkAccess'),
+    // Section 3
+    soc2Status: get('soc2Status'),
+    // Section 4
+    amlProgram: get('amlProgram'),
+    ofacScreening: get('ofacScreening'),
+    amlNotes: get('amlNotes'),
+    // Section 5
+    piiCategories: getChecks('piiCategories'),
+    subcontractors: getRadio('subcontractors'),
+    dataOverseas: getRadio('dataOverseas'),
+    overseasCountries: get('overseasCountries'),
+    overseasSafeguards: get('overseasSafeguards'),
+    overseasEncryption: getRadio('overseasEncryption'),
+    // Section 7
+    contractStatus: getRadio('contractStatus'),
+    complianceConcerns: get('complianceConcerns'),
+    additionalNotes: get('additionalNotes'),
+  };
+}
+
+function validateForm(data) {
+  const required = ['vendorName','relType','submitterName','serviceDesc'];
+  const missing = required.filter(k => !data[k]);
+  if (missing.length > 0) return `Please complete required fields: ${missing.join(', ')}`;
+
+  const requiredRadios = ['piiAccess','paymentInvolvement','customerInteraction','substitutability','bankNetworkAccess','subcontractors','dataOverseas'];
+  const missingRadios = requiredRadios.filter(k => data[k] === 'Not answered');
+  if (missingRadios.length > 0) return `Please answer all required questions (marked with *). Missing: ${missingRadios.length} required selection(s).`;
+
+  return null;
+}
+
+function buildUserMessage(data) {
+  return `TPRM Questionnaire Submission — ${data.vendorName}
+
+SECTION 1: VENDOR INFORMATION
+Vendor Name: ${data.vendorName}
+Relationship Type: ${data.relType}
+Submitted By: ${data.submitterName}${data.submitterDept ? ` (${data.submitterDept})` : ''}
+Service Description: ${data.serviceDesc}
+Vendor Website: ${data.vendorWebsite || 'Not provided'}
+Trust Center URL: ${data.trustCenter || 'Not provided'}
+Privacy Policy URL: ${data.privacyPolicy || 'Not provided'}
+Estimated Contract Value: ${data.contractValue || 'Not provided'}
+
+SECTION 2: RISK PROFILE
+Customer PII Access: ${data.piiAccess}
+Payment Processing Involvement: ${data.paymentInvolvement}
+Direct Customer Interaction: ${data.customerInteraction}
+Substitutability: ${data.substitutability}
+Bank Network Access: ${data.bankNetworkAccess}
+
+SECTION 3: INFORMATION SECURITY
+SOC 2 Status: ${data.soc2Status}
+SOC 2 / Certification Document: ${uploadedFiles['soc2File'] ? `Uploaded — ${uploadedFiles['soc2File'].name}` : 'Not uploaded'}
+
+SECTION 4: BSA/AML & FINANCIAL CRIME
+BSA/AML Compliance Program: ${data.amlProgram}
+OFAC / Sanctions Screening: ${data.ofacScreening}
+Additional AML Notes: ${data.amlNotes || 'None'}
+
+SECTION 5: DATA PRIVACY & INTERNATIONAL DATA
+PII Categories Accessed: ${data.piiCategories}
+Subcontractor Data Access: ${data.subcontractors}
+Data Stored or Transmitted Outside the US: ${data.dataOverseas}${data.overseasCountries ? `\nCountries / Regions: ${data.overseasCountries}` : ''}${data.overseasSafeguards ? `\nInternational Transfer Mechanism: ${data.overseasSafeguards}` : ''}${data.overseasEncryption && data.overseasEncryption !== 'Not answered' ? `\nData Encrypted in Cross-Border Transit: ${data.overseasEncryption}` : ''}
+
+SECTION 6: ADDITIONAL CONTEXT
+Contract Status: ${data.contractStatus}
+Known Compliance/Legal/Reputational Concerns: ${data.complianceConcerns || 'None noted'}
+Additional Notes: ${data.additionalNotes || 'None'}
+
+Please produce the full TPRM Review using the exact section headers specified in your instructions.`;
+}
+
+// ── SUBMIT REVIEW ────────────────────────────────────────────────────
+async function submitReview() {
+  const data = collectFormData();
+  const validationError = validateForm(data);
+  if (validationError) {
+    showError(validationError);
+    return;
+  }
+
+  hideError();
+  setLoading(true, 'Running TPRM assessment against Flex policy...');
+  updateProgress(6, 6);
+
+  try {
+    const response = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: 'user', content: buildUserMessage(data) }]
+      })
+    });
+
+    const result = await response.json();
+    if (result.error) throw new Error(result.error.message || JSON.stringify(result.error));
+
+    const text = result.content?.find(b => b.type === 'text')?.text || '';
+    if (!text) throw new Error('No response received from Claude. Please try again.');
+
+    reviewData = {
+      text,
+      vendor: data.vendorName,
+      tier: extractTier(text, 'INHERENT'),
+      residual: extractTier(text, 'RESIDUAL'),
+      criticality: extractCriticality(text)
+    };
+
+    renderResults(data);
+
+  } catch(e) {
+    showError('Error running review: ' + e.message);
+  } finally {
+    setLoading(false);
+  }
+}
+
+// ── RENDER RESULTS ───────────────────────────────────────────────────
+function renderResults(data) {
+  document.getElementById('questionnaireView').style.display = 'none';
+  document.getElementById('resultsView').classList.add('visible');
+  window.scrollTo(0, 0);
+
+  document.getElementById('resultsVendorName').textContent = data.vendorName;
+
+  const tClass = reviewData.tier === 'High' ? 'rbadge-high' : reviewData.tier === 'Moderate' ? 'rbadge-medium' : 'rbadge-low';
+  const rClass = reviewData.residual === 'High' ? 'rbadge-high' : reviewData.residual === 'Moderate' ? 'rbadge-medium' : 'rbadge-low';
+  const cClass = reviewData.criticality === 'Critical' ? 'rbadge-critical' : 'rbadge-noncritical';
+
+  document.getElementById('resultsBadgeRow').innerHTML = `
+    <span class="rbadge ${tClass}">Inherent: ${reviewData.tier}</span>
+    <span class="rbadge ${rClass}">Residual: ${reviewData.residual}</span>
+    <span class="rbadge ${cClass}">${reviewData.criticality}</span>
+    <span class="rbadge" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.7)">${reviewData.tier} / ${reviewData.residual} / ${reviewData.criticality}</span>`;
+
+  const sections = parseSections(reviewData.text);
+  const defs = [
+    { key: 'VENDOR PROFILE SUMMARY', label: 'Vendor Profile Summary', n: '1' },
+    { key: 'RISK TIER — INHERENT', label: 'Risk Tier — Inherent', n: '2' },
+    { key: 'CRITICALITY ASSESSMENT', label: 'Criticality Assessment', n: '3' },
+    { key: 'DOMAIN SCORECARD', label: 'Domain Scorecard', n: '4' },
+    { key: 'RESIDUAL RISK', label: 'Residual Risk', n: '5' },
+    { key: 'GAPS & FLAGS', label: 'Gaps & Flags', n: '6' },
+    { key: 'FOLLOW-UP QUESTIONS', label: 'Follow-Up Questions', n: '7' },
+    { key: 'RISK MEMO', label: 'Risk Memo', n: '8' },
+  ];
+
+  const container = document.getElementById('resultSectionsContainer');
+  container.innerHTML = '';
+
+  const fullCopyDiv = document.createElement('div');
+  fullCopyDiv.style.cssText = 'display:flex;justify-content:flex-end;margin-bottom:12px;';
+  fullCopyDiv.innerHTML = `<button class="copy-btn" onclick="copyText(this,\`${esc(reviewData.text)}\`)">⎘ Copy Full Review</button>`;
+  container.appendChild(fullCopyDiv);
+
+  defs.forEach((def, i) => {
+    const content = sections[def.key] || '';
+    if (!content) return;
+    const isOpen = i === 0;
+    const isMemo = def.key === 'RISK MEMO';
+    const card = document.createElement('div');
+    card.className = 'result-card';
+    card.innerHTML = `
+      <div class="result-card-head ${isOpen?'open':''}" onclick="toggleCard(this)">
+        <div class="result-card-title">
+          <div class="result-card-num">${def.n}</div>
+          ${def.label}
+        </div>
+        <span class="result-chevron">▼</span>
+      </div>
+      <div class="result-card-body ${isOpen?'open':''}">
+        <div class="${isMemo?'result-memo':'result-content'}">${escHtml(content)}</div>
+        <div class="result-footer">
+          <button class="copy-btn" onclick="copyText(this,\`${esc(content)}\`)">⎘ Copy</button>
+        </div>
+      </div>`;
+    container.appendChild(card);
+  });
+
+  // Drive save setup
+  const today = new Date().toISOString().split('T')[0];
+  const safeName = data.vendorName.replace(/[^a-zA-Z0-9]/g,'');
+  const crit = reviewData.criticality === 'Critical' ? 'Critical' : 'NonCritical';
+  const filename = `TPRM_${safeName}_${reviewData.tier}-${reviewData.residual}-${crit}_${today}`;
+  const vendorFolder = `${safeName}_${today}`;
+
+  document.getElementById('folderPath').innerHTML = `📁 Legal and Compliance / Vendor Documents / <strong>${vendorFolder}</strong>`;
+  document.getElementById('filenamePill').textContent = filename + '.gdoc';
+  document.getElementById('saveDriveBtn').dataset.filename = filename;
+  document.getElementById('saveDriveBtn').dataset.vendorfolder = vendorFolder;
+}
+
+// ── GOOGLE DRIVE SAVE ────────────────────────────────────────────────
+async function saveToDrive() {
+  if (!googleToken) {
+    if (!tokenClient) { showSaveResult('error', 'Google auth not initialized. Please refresh the page.'); return; }
+    tokenClient.requestAccessToken({ prompt: 'consent' });
+    setTimeout(saveToDrive, 3000);
+    return;
+  }
+
+  const btn = document.getElementById('saveDriveBtn');
+  const memo = parseSections(reviewData.text)['RISK MEMO'] || reviewData.text;
+  const filename = btn.dataset.filename;
+  const vendorFolder = btn.dataset.vendorfolder;
+
+  btn.disabled = true;
+  btn.innerHTML = '<span>⏳</span> Creating folder & document…';
+
+  try {
+    const folderId = await ensureFolderPath(['Legal and Compliance', 'Vendor Documents', vendorFolder]);
+
+    btn.innerHTML = '<span>⏳</span> Saving risk memo…';
+    const docResp = await fetch('https://docs.googleapis.com/v1/documents', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${googleToken}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: filename })
+    });
+
+    if (!docResp.ok) throw new Error('Could not create Google Doc');
+    const doc = await docResp.json();
+    const docId = doc.documentId;
+
+    await fetch(`https://docs.googleapis.com/v1/documents/${docId}:batchUpdate`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${googleToken}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ requests: [{ insertText: { location: { index: 1 }, text: memo } }] })
+    });
+
+    await fetch(`https://www.googleapis.com/drive/v3/files/${docId}?addParents=${folderId}&removeParents=root`, {
+      method: 'PATCH',
+      headers: { 'Authorization': `Bearer ${googleToken}` }
+    });
+
+    const docUrl = `https://docs.google.com/document/d/${docId}/edit`;
+    const folderUrl = `https://drive.google.com/drive/folders/${folderId}`;
+
+    btn.innerHTML = '<span>✓</span> Saved to Drive';
+    btn.className = 'save-btn saved';
+
+    showSaveResult('success',
+      `✓ Saved to <em>Legal and Compliance / Vendor Documents / ${vendorFolder}</em><br><br>` +
+      `📄 <a href="${docUrl}" target="_blank">Open Risk Memo →</a><br>` +
+      `📁 <a href="${folderUrl}" target="_blank">Open Vendor Folder →</a>`);
+
+  } catch(e) {
+    btn.disabled = false;
+    btn.innerHTML = '<span>📄</span> Create Google Doc in Drive';
+    showSaveResult('error', 'Error saving to Drive: ' + e.message);
+  }
+}
+
+async function ensureFolderPath(parts) {
+  let parentId = 'root';
+  for (const name of parts) {
+    const q = encodeURIComponent(`name='${name}' and mimeType='application/vnd.google-apps.folder' and '${parentId}' in parents and trashed=false`);
+    const searchResp = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`, {
+      headers: { 'Authorization': `Bearer ${googleToken}` }
+    });
+    const searchData = await searchResp.json();
+    if (searchData.files?.length > 0) {
+      parentId = searchData.files[0].id;
+    } else {
+      const createResp = await fetch('https://www.googleapis.com/drive/v3/files', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${googleToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, mimeType: 'application/vnd.google-apps.folder', parents: [parentId] })
+      });
+      const folder = await createResp.json();
+      parentId = folder.id;
+    }
+  }
+  return parentId;
+}
+
+// ── PARSE / EXTRACT ──────────────────────────────────────────────────
+function parseSections(text) {
+  const out = {};
+  const re = /###\s+([A-Z][A-Z0-9 &\/—\-]+)\n([\s\S]*?)(?=###\s+[A-Z]|$)/g;
+  let m;
+  while ((m = re.exec(text)) !== null) out[m[1].trim()] = m[2].trim();
+  return out;
+}
+
+function extractTier(text, type) {
+  const keyword = type === 'INHERENT' ? 'INHERENT' : 'RESIDUAL';
+  const re = new RegExp(`### (?:RISK TIER — )?${keyword}[\\s\\S]*?\\n([\\s\\S]*?)(?=###|$)`);
+  const match = text.match(re);
+  const chunk = match ? match[1] : text;
+  if (/\bHigh\b/i.test(chunk)) return 'High';
+  if (/\bModerate\b/i.test(chunk)) return 'Moderate';
+  if (/\bLow\b/i.test(chunk)) return 'Low';
+  return 'Unknown';
+}
+
+function extractCriticality(text) {
+  const re = /### CRITICALITY ASSESSMENT[\s\S]*?\n([\s\S]*?)(?=###|$)/;
+  const match = text.match(re);
+  const chunk = match ? match[1] : text;
+  if (/Non-Critical/i.test(chunk)) return 'Non-Critical';
+  if (/\bCritical\b/i.test(chunk)) return 'Critical';
+  return 'Unknown';
+}
+
+// ── UI ───────────────────────────────────────────────────────────────
+function toggleCard(head) {
+  head.classList.toggle('open');
+  head.nextElementSibling.classList.toggle('open');
+}
+
+function copyText(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.classList.add('copied');
+    btn.innerHTML = '✓ Copied';
+    setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = '⎘ Copy'; }, 2000);
+  });
+}
+
+function copyFilename(btn) {
+  navigator.clipboard.writeText(document.getElementById('filenamePill').textContent).then(() => {
+    btn.classList.add('copied');
+    btn.textContent = '✓';
+    setTimeout(() => { btn.classList.remove('copied'); btn.textContent = 'Copy'; }, 2000);
+  });
+}
+
+function showSaveResult(type, msg) {
+  const el = document.getElementById('saveResult');
+  el.className = `save-result ${type}`;
+  el.innerHTML = msg;
+}
+
+function setLoading(on, msg='') {
+  document.getElementById('loadingArea').classList.toggle('visible', on);
+  if (msg) document.getElementById('loadingLabel').textContent = msg;
+  document.getElementById('submitBtn').disabled = on;
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorBox');
+  el.textContent = msg;
+  el.classList.add('visible');
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function hideError() {
+  document.getElementById('errorBox').classList.remove('visible');
+}
+
+function resetApp() {
+  document.getElementById('questionnaireView').style.display = '';
+  document.getElementById('resultsView').classList.remove('visible');
+  document.getElementById('saveResult').className = 'save-result';
+  document.getElementById('saveDriveBtn').disabled = false;
+  document.getElementById('saveDriveBtn').innerHTML = '<span>📄</span> Create Google Doc in Drive';
+  document.getElementById('saveDriveBtn').className = 'save-btn';
+  window.scrollTo(0, 0);
+  updateProgress(1, 7);
+}
+
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function esc(s) { return s.replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/\$/g,'\\$'); }
+
+// ── PROGRESS TRACKING ─────────────────────────────────────────────
+function trackProgress() {
+  const sections = ['sec1','sec2','sec3','sec4','sec5','sec6'];
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const idx = sections.indexOf(e.target.id) + 1;
+        if (idx > 0) updateProgress(idx, 6);
+      }
+    });
+  }, { threshold: 0.3 });
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) observer.observe(el);
+  });
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  initGoogleAuth();
+  trackProgress();
+});
+</script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</body>
+</html>
